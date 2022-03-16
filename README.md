@@ -17,18 +17,20 @@
 </a>
 
 ## Features
+
 - Supported commands
   - ✅ CONNECT
   - ❌ BIND
   - ✅ UDP ASSOCIATE
-  
+
 - Supported authentication methods
   - No authentication
   - Username & password
 
 ## Usage
+
 ```typescript
-import { Client } from "https://deno.land/x/socks5/client.ts"
+import { Client } from "https://deno.land/x/socks5/client.ts";
 
 const config = {
   // hostname of the proxy server
@@ -51,3 +53,4 @@ client.connect(connectOpts);
 Deno.listenDatagram(listenOpts);
 // with
 client.listenDatagram(listenOpts);
+```
