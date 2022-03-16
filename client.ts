@@ -1,5 +1,5 @@
 import { writeAll } from "https://deno.land/std@0.128.0/streams/conversion.ts#^";
-import { uint8ArrayToReader, readN } from "./utils.ts";
+import { readN, uint8ArrayToReader } from "./utils.ts";
 
 export const SOCKS_VERSION = 5;
 export const USERNAME_PASSWORD_AUTH_VERSION = 1;
@@ -155,7 +155,7 @@ export class Client {
     }
     await writeAll(
       conn,
-      Uint8Array.from([SOCKS_VERSION, methods.length, ...methods])
+      Uint8Array.from([SOCKS_VERSION, methods.length, ...methods]),
     );
     const [negotiationVersion, method] = await readN(conn, 2);
     if (
@@ -170,7 +170,7 @@ export class Client {
       throw new Error(
         negotiationVersion !== SOCKS_VERSION
           ? `unsupported SOCKS version number: ${negotiationVersion}`
-          : "no acceptable authentication methods"
+          : "no acceptable authentication methods",
       );
     }
 
@@ -187,7 +187,7 @@ export class Client {
           ...username,
           password.length,
           ...password,
-        ])
+        ]),
       );
       const [authVersion, status] = await readN(conn, 2);
       if (
@@ -202,7 +202,7 @@ export class Client {
         throw new Error(
           authVersion !== USERNAME_PASSWORD_AUTH_VERSION
             ? `unsupported authentication version number: ${authVersion}`
-            : "authentication failed"
+            : "authentication failed",
         );
       }
     }
@@ -215,7 +215,7 @@ export class Client {
         cmd,
         0,
         ...serializeAddress(hostname, port),
-      ])
+      ]),
     );
     const [replyVersion, status, _] = await readN(conn, 3);
     if (replyVersion !== SOCKS_VERSION || status !== ReplyStatus.Success) {
@@ -227,7 +227,7 @@ export class Client {
       throw new Error(
         replyVersion !== SOCKS_VERSION
           ? `unsupported SOCKS version number: ${replyVersion}`
-          : decodeError(status)
+          : decodeError(status),
       );
     }
 
@@ -246,7 +246,7 @@ export class Client {
     const { conn, hostname, port } = await this.#connectAndRequest(
       Command.Connect,
       remoteAddr.hostname,
-      remoteAddr.port
+      remoteAddr.port,
     );
     const localAddr = {
       hostname,
@@ -284,7 +284,7 @@ export class Client {
   }
 
   listenDatagram(
-    opts: Deno.ListenOptions & { transport: "udp" }
+    opts: Deno.ListenOptions & { transport: "udp" },
   ): Deno.DatagramConn & { readonly isReady: Promise<void> } {
     const udpConn = Deno.listenDatagram(opts);
     let proxyInfo: null | UdpProxyInfo = null;
@@ -312,7 +312,7 @@ export class Client {
         const { conn, hostname, port } = await this.#connectAndRequest(
           Command.UdpAssociate,
           localAddr.hostname,
-          localAddr.port
+          localAddr.port,
         );
         proxyInfo = {
           tcpConn: conn,
@@ -354,7 +354,7 @@ export class Client {
         const netAddr = addr as Deno.NetAddr;
         const serializedAddress = serializeAddress(
           netAddr.hostname,
-          netAddr.port
+          netAddr.port,
         );
         const msg = new Uint8Array(3 + serializedAddress.length + p.length);
         msg.set(serializedAddress, 3);
@@ -371,7 +371,7 @@ export class Client {
         }
 
         const { hostname, port, bytesRead } = await deserializeAddress(
-          uint8ArrayToReader(res.subarray(3))
+          uint8ArrayToReader(res.subarray(3)),
         );
         return [
           res.subarray(3 + bytesRead),

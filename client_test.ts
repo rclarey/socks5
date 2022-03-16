@@ -396,7 +396,7 @@ Deno.test("connectAndRequest() - request failed", async (t) => {
 });
 
 Deno.test("connect() - localAddr and remoteAddr are correct", async () => {
-  const { values, close } = mockServer({
+  const { close } = mockServer({
     // 127.0.0.1:1080
     address: Uint8Array.from([AddrType.IPv4, 127, 0, 0, 1, 4, 56]),
   });
@@ -425,7 +425,7 @@ Deno.test("connect() - localAddr and remoteAddr are correct", async () => {
 });
 
 Deno.test("connect() - can read", async () => {
-  const { values, close } = mockServer();
+  const { close } = mockServer();
   const client = new Client(config);
   const conn = await client.connect(connectOptions);
 
@@ -464,7 +464,7 @@ Deno.test("connect() - can write", async () => {
 });
 
 Deno.test("connect() - can close", async () => {
-  const { values, close } = mockServer();
+  const { close } = mockServer();
   const client = new Client(config);
   const conn = await client.connect(connectOptions);
 
@@ -479,7 +479,7 @@ Deno.test("connect() - can close", async () => {
 });
 
 Deno.test("listenDatagram() - addr is correct", async () => {
-  const { values, close } = mockServer({
+  const { close } = mockServer({
     // 127.0.0.1:9876
     address: Uint8Array.from([AddrType.IPv4, 127, 0, 0, 1, 38, 148]),
   });
@@ -498,7 +498,7 @@ Deno.test("listenDatagram() - addr is correct", async () => {
 });
 
 Deno.test("listenDatagram() - UDP closed if negotiation fails", async () => {
-  const { values, close } = mockServer({
+  const { close } = mockServer({
     socksVersion: 4,
   });
   const client = new Client(config);
