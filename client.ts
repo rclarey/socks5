@@ -237,7 +237,7 @@ export class Client {
     };
   };
 
-  async connect(opts: Deno.ConnectOptions): Promise<Deno.Conn> {
+  async connect(opts: Deno.ConnectOptions): Promise<Deno.TcpConn> {
     const remoteAddr = {
       hostname: opts.hostname ?? "127.0.0.1",
       port: opts.port,
@@ -362,6 +362,10 @@ export class Client {
         return udpConn.send(msg, proxyInfo!.addr);
       },
       async receive(p?: Uint8Array): Promise<[Uint8Array, Deno.Addr]> {
+        if (!proxyInfo) {
+          await isReady;
+        }
+
         const buff = new Uint8Array(p ? p.length + 1024 : 2048);
         const [res] = await udpConn.receive(buff);
         // if first two reserved bytes are not zero, or the fragment value is
