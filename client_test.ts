@@ -548,79 +548,85 @@ Deno.test("listenDatagram() - send() encodes header correctly", async () => {
   close();
 });
 
-// FIXME: unskip these when bug in Deno is fixed https://github.com/denoland/deno/issues/13729
-// Deno.test("listenDatagram() - receive() ignores datagrams with non-zero reserved bytes", async () => {
-//   const server = mockServer();
-//   let udpServer: Deno.DatagramConn;
-//   let buff: Uint8Array;
-//   (async () => {
-//     const addr = {
-//       ...listenOptions,
-//       hostname: "127.0.0.1",
-//     };
-//     udpServer = Deno.listenDatagram({ port: 2080, transport: "udp" });
-//     // reserve bytes are 01
-//     const nonZeroReserve = new Uint8Array(12);
-//     nonZeroReserve[1] = 1;
-//     await udpServer.send(nonZeroReserve, addr);
-//     buff = crypto.getRandomValues(new Uint8Array(8));
-//     // reserve bytes are 00
-//     udpServer.send(
-//       Uint8Array.from([0, 0, 0, ...ip4Address.serialized, ...buff]),
-//       addr,
-//     );
-//   })();
+Deno.test(
+  "listenDatagram() - receive() ignores datagrams with non-zero reserved bytes",
+  async () => {
+    const server = mockServer();
+    let udpServer: Deno.DatagramConn;
+    let buff: Uint8Array;
+    (async () => {
+      const addr = {
+        ...listenOptions,
+        hostname: "127.0.0.1",
+      };
+      udpServer = Deno.listenDatagram({ port: 2080, transport: "udp" });
+      // reserve bytes are 01
+      const nonZeroReserve = new Uint8Array(12);
+      nonZeroReserve[1] = 1;
+      await udpServer.send(nonZeroReserve, addr);
+      buff = crypto.getRandomValues(new Uint8Array(8));
+      // reserve bytes are 00
+      udpServer.send(
+        Uint8Array.from([0, 0, 0, ...ip4Address.serialized, ...buff]),
+        addr,
+      );
+    })();
 
-//   const client = new Client(config);
-//   const conn = client.listenDatagram(listenOptions);
-//   const recv = await conn.receive();
-//   assertEquals(recv[0], buff!);
-//   assertEquals(recv[1], {
-//     hostname: ip4Address.hostname,
-//     port: ip4Address.port,
-//     transport: "udp",
-//   });
+    const client = new Client(config);
+    const conn = client.listenDatagram(listenOptions);
+    const recv = await conn.receive();
+    assertEquals(recv[0], buff!);
+    assertEquals(recv[1], {
+      hostname: ip4Address.hostname,
+      port: ip4Address.port,
+      transport: "udp",
+    });
 
-//   udpServer!.close();
-//   server.close();
-// });
+    conn.close();
+    udpServer!.close();
+    server.close();
+  },
+);
 
-// Deno.test("listenDatagram() - receive() ignores datagrams with non-zero fragment", async () => {
-//   const server = mockServer();
-//   let udpServer: Deno.DatagramConn;
-//   let buff: Uint8Array;
-//   (async () => {
-//     const addr = {
-//       ...listenOptions,
-//       hostname: "127.0.0.1",
-//     };
-//     udpServer = Deno.listenDatagram({ port: 2080, transport: "udp" });
-//     // fragment byte is 1
-//     const nonZeroReserve = new Uint8Array(12);
-//     nonZeroReserve[2] = 1;
-//     await udpServer.send(nonZeroReserve, addr);
-//     buff = crypto.getRandomValues(new Uint8Array(8));
-//     // fragment byte is 0
-//     udpServer.send(
-//       Uint8Array.from([0, 0, 0, ...ip4Address.serialized, ...buff]),
-//       addr,
-//     );
-//   })();
+Deno.test(
+  "listenDatagram() - receive() ignores datagrams with non-zero fragment",
+  async () => {
+    const server = mockServer();
+    let udpServer: Deno.DatagramConn;
+    let buff: Uint8Array;
+    (async () => {
+      const addr = {
+        ...listenOptions,
+        hostname: "127.0.0.1",
+      };
+      udpServer = Deno.listenDatagram({ port: 2080, transport: "udp" });
+      // fragment byte is 1
+      const nonZeroReserve = new Uint8Array(12);
+      nonZeroReserve[2] = 1;
+      await udpServer.send(nonZeroReserve, addr);
+      buff = crypto.getRandomValues(new Uint8Array(8));
+      // fragment byte is 0
+      udpServer.send(
+        Uint8Array.from([0, 0, 0, ...ip4Address.serialized, ...buff]),
+        addr,
+      );
+    })();
 
-//   const client = new Client(config);
-//   const conn = client.listenDatagram(listenOptions);
-//   const recv = await conn.receive();
-//   assertEquals(recv[0], buff!);
-//   assertEquals(recv[1], {
-//     hostname: ip4Address.hostname,
-//     port: ip4Address.port,
-//     transport: "udp",
-//   });
+    const client = new Client(config);
+    const conn = client.listenDatagram(listenOptions);
+    const recv = await conn.receive();
+    assertEquals(recv[0], buff!);
+    assertEquals(recv[1], {
+      hostname: ip4Address.hostname,
+      port: ip4Address.port,
+      transport: "udp",
+    });
 
-//   conn.close();
-//   udpServer!.close();
-//   server.close();
-// });
+    conn.close();
+    udpServer!.close();
+    server.close();
+  },
+);
 
 Deno.test("listenDatagram() - receive() decodes header correctly", async () => {
   const server = mockServer({
